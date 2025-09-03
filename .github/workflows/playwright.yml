@@ -10,6 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    # Cache npm
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    # Cache Playwright browsers
+    - name: Cache Playwright browsers
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-browsers
+
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
@@ -25,3 +41,15 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+      # ✅ NEW STEP: Add test summary to GitHub Actions UI
+    - name: Add test summary to GitHub Actions UI
+      if: always()
+      run: |
+        echo "## ✅ Playwright Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "Test run completed on branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "🎯 View the full HTML report in the Artifacts section below." >> $GITHUB_STEP_SUMMARY
+    - name: Send metrics to Datadog
+      uses: DataDog/datadog-ci-action@v3
+      with:
+        api-key: ${{ secrets.DATADOG_API_KEY }}
+        site: datadoghq.eu
