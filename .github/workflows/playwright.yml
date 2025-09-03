@@ -72,4 +72,4 @@ jobs:
         DD_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         DD_SITE: datadoghq.eu
       run: |
-        datadog-ci tests run --reporter junit --files test-results/results.xml
+        datadog-ci junit upload test-results/results.xml
