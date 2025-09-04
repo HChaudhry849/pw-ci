@@ -72,4 +72,6 @@ jobs:
         DD_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         DD_SITE: datadoghq.eu
       run: |
-        datadog-ci junit upload test-results/results.xml
+        datadog-ci junit upload test-results/results.xml \
+          --service playwright-tests
+
